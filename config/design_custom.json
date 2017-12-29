@@ -1,0 +1,32 @@
+{
+	"join_method": "xcorr",
+	"net_path": "./pretrained/net-epoch-50.net.mat",
+	"net_gray": "",
+	"windowing": "cosine_sum",
+	"exemplar_sz": 127,
+	"search_sz": 255,
+	"score_sz": 17,
+	"tot_stride": 8,
+	"context": 0.5,
+	"pad_with_image_mean": true,
+
+	"response_up": 16,
+	"window_influence": 0.176,
+	"z_lr": 0.01,
+	"scale_num": 3,
+	"scale_step": 1.0375,
+	"scale_penalty": 0.9745,
+	"scale_lr": 0.59,
+	"scale_min": 0.2,
+	"scale_max": 5,
+
+	"net" : {
+		"conv_stride" : [2,1,1,1,1],
+		"filtergroup_yn" : [0,1,0,1,1],
+		"bnorm_yn" : [0,0,0,0,1],
+		"relu_yn" : [0,0,0,0,1],
+		"pool_stride" : [2,2,0,0,0],
+		"pool_sz" : 3,
+		"bnorm_adjust" : true
+	}
+}
