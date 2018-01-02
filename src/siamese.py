@@ -83,23 +83,15 @@ def _create_siamese(net_path, net_x, net_z):
         conv_b = params_values_list[params_names_list.index(conv_b_name)]
         # batchnorm
         if _bnorm_yn[i]:
-            final_bn_names = _find_params('adjust', params_names_list)
-            bn_beta = 0
-            bn_gamma = 1
-            bn_moving_mean = 0
-            bn_moving_variance = 1
-
-            final_bn_names_beta = [p for p in final_bn_names if p[-1]=='b']
-            if len(final_bn_names_beta) > 0:
-                bn_beta = params_values_list[params_names_list.index(final_bn_names_beta[0])]
-            final_bn_names_gamma = [p for p in final_bn_names if p[-1]=='f' or p[-1]=='m']
-            if len(final_bn_names_gamma) > 0:
-                bn_gamma = params_values_list[params_names_list.index(final_bn_names_gamma[0])]
-            final_bn_names_moments = [p for p in final_bn_names if p[-1]=='x']
-            if len(final_bn_names_moments) > 0:
-                bn_moments = params_values_list[params_names_list.index(final_bn_names_moments[0])]
-                bn_moving_mean = bn_moments[:,0]
-                bn_moving_variance = bn_moments[:,1]**2
+            bn_beta_name = _find_params('bn'+str(i+1)+'b', params_names_list)[0]
+            bn_gamma_name = _find_params('bn'+str(i+1)+'m', params_names_list)[0]
+            bn_moments_name = _find_params('bn'+str(i+1)+'x', params_names_list)[0]
+            print '\t\tBNORM: setting '+bn_beta_name+' '+bn_gamma_name+' '+bn_moments_name
+            bn_beta = params_values_list[params_names_list.index(bn_beta_name)]
+            bn_gamma = params_values_list[params_names_list.index(bn_gamma_name)]
+            bn_moments = params_values_list[params_names_list.index(bn_moments_name)]
+            bn_moving_mean = bn_moments[:,0]
+            bn_moving_variance = bn_moments[:,1]**2 # saved as std in matconvnet
         else:
             bn_beta = bn_gamma = bn_moving_mean = bn_moving_variance = []
         
@@ -120,7 +112,7 @@ def _create_siamese(net_path, net_x, net_z):
             print '\t\tMAX-POOL: size '+str(_pool_sz)+ ' and stride '+str(_pool_stride[i])
             net_x = tf.nn.max_pool(net_x, [1,_pool_sz,_pool_sz,1], strides=[1,_pool_stride[i],_pool_stride[i],1], padding='VALID', name='pool'+str(i+1))
             net_z = tf.nn.max_pool(net_z, [1,_pool_sz,_pool_sz,1], strides=[1,_pool_stride[i],_pool_stride[i],1], padding='VALID', name='pool'+str(i+1))
-
+            
     print
 
     return net_z, net_x, params_names_list, params_values_list

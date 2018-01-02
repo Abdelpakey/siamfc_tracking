@@ -157,7 +157,7 @@ class SiameseNetwork(object):
                                 bn_beta, bn_gamma, bn_moving_mean, bn_moving_variance, \
                                 filtergroup=_filtergroup_yn[i], batchnorm=_bnorm_yn[i], activation=_relu_yn[i], \
                                 scope='conv'+str(i+1), reuse=True, trainable=self.trainable)    
-            
+
             # add max pool if required
             if _pool_stride[i]>0:
                 print '\t\tMAX-POOL: size '+str(_pool_sz)+ ' and stride '+str(_pool_stride[i])
@@ -451,21 +451,11 @@ if __name__ == '__main__':
 
     # manually label first frame
     # first_frame_bbox = get_bbox_from_image(cv2.imread(frame_name_list[0]))
-    frame_bbox1 = np.array([123, 285, 86, 69])
-    frame_bbox2 = np.array([75, 109, 53, 33])
-    frame_bbox3 = np.array([295, 90, 77, 59])
-    frame_bbox4 = np.array([263, 76, 48, 32])
-    frame_bbox5 = np.array([573, 307, 60, 84])
-    frame_bbox6 = np.array([526, 311, 45, 53])
+    frame_bboxes = np.array([[123, 285, 86, 69],[75, 109, 53, 33],[295, 90, 77, 59],[263, 76, 48, 32],[573, 307, 60, 84],[526, 311, 45, 53]])
 
-    pos_x, pos_y, target_w, target_h = region_to_bbox(frame_bbox1)
-    pos_x2, pos_y2, target_w2, target_h2 = region_to_bbox(frame_bbox2)
-    pos_x3, pos_y3, target_w3, target_h3 = region_to_bbox(frame_bbox3)
-    pos_x4, pos_y4, target_w4, target_h4 = region_to_bbox(frame_bbox4)
-    pos_x5, pos_y5, target_w5, target_h5 = region_to_bbox(frame_bbox5)
-    pos_x6, pos_y6, target_w6, target_h6 = region_to_bbox(frame_bbox6)
+    bbox_data = np.array([region_to_bbox(bbox) for bbox in frame_bboxes])
 
-    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.2)
+    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.5)
     sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
     
     # with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
@@ -479,19 +469,11 @@ if __name__ == '__main__':
     # # init with exemplar 'z' image
     first_frame = cv2.imread(frame_name_list[start_idx])
     first_frame = first_frame.astype(np.float32)
-    # pos_x = [pos_x]
-    # pos_y = [pos_y]
-    # target_w = [target_w]
-    # target_h = [target_h]
 
-    # pos_x = [pos_x,pos_x2,pos_x3]
-    # pos_y = [pos_y,pos_y2,pos_y3]
-    # target_w = [target_w,target_w2,target_w3]
-    # target_h = [target_h,target_h2,target_h3]
-    pos_x = [pos_x,pos_x2,pos_x3,pos_x4,pos_x5]#,pos_x6]
-    pos_y = [pos_y,pos_y2,pos_y3,pos_y4,pos_y5]#,pos_y6]
-    target_w = [target_w,target_w2,target_w3,target_w4,target_w5]#,target_w6]
-    target_h = [target_h,target_h2,target_h3,target_h4,target_h5]#,target_w6]
+    pos_x = bbox_data[:,0]
+    pos_y = bbox_data[:,1]
+    target_w = bbox_data[:,2]
+    target_h = bbox_data[:,3]
     siam_net.forward_z(first_frame, pos_x, pos_y, target_w, target_h)
     
     rnd_colors_bgr = np.array([(np.random.rand(3)*255).astype(np.int) for p in pos_x])

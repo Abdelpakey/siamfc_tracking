@@ -79,7 +79,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-cfg", "--config", type=str, help="config path", required=True)
     parser.add_argument("-f", "--folder", type=str, help="image folder", required=True)
-    parser.add_argument("--start_idx", type=int, help="Start frame idex (zero-indexed). Default 0", default=0)
+    parser.add_argument("--start_idx", type=int, help="Start frame index (zero-indexed). Default 0", default=0)
     parser.add_argument("--skip", type=int, help="Number of frames to skip between inference. Default 0", default=0)
     args = parser.parse_args()
 
